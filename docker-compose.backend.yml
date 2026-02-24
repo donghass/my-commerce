@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+
+  redis:
+    image: redis:7.0.0
+    container_name: commerce-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - commerce-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: commerce-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://my-commerce.chu2qs0wwc12.eu-north-1.rds.amazonaws.com:3306/commerce?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+      SPRING_DATASOURCE_USERNAME: adminCom
+      SPRING_DATASOURCE_PASSWORD: dongha95
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET: changeThisSecret
+    depends_on:
+      - redis
+    networks:
+      - commerce-network
+
+volumes:
+  redis_data:
+
+networks:
+  commerce-network:
+    driver: bridge

@@ -1,0 +1,7 @@
+package com.commerce.application.auth;
+
+public record LoginCommand(
+        String email,
+        String password
+) {
+}
